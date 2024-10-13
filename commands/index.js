@@ -4,3 +4,4 @@ export { hashFile } from "./hash.js";
 export { compress, decompress } from "./compress.js";
 export { printAvailableCommands } from "./help.js";
 export { messages } from "./messages.js";
+export { cat } from "./cat.js";

@@ -7,7 +7,9 @@ import {
   compress,
   decompress,
   messages,
+  cat,
 } from "./commands/index.js";
+import path from "path";
 import readline from "readline";
 import os from "os";
 
@@ -44,6 +46,17 @@ const startFileManager = (username) => {
         case "ls":
           ls(currentDirectory);
           break;
+        case "cat":
+          if (args.length === 0) {
+            console.log(messages.ERRORS.MISSING_FILE_PATH);
+          } else {
+            const filePath = path.isAbsolute(args[0])
+              ? args[0]
+              : path.join(currentDirectory, args.join(" "));
+            cat(filePath);
+          }
+          break;
+
         case "os":
           if (args.length === 0) {
             console.log(messages.ERRORS.MISSING_OS_ARGUMENT);
