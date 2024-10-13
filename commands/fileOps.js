@@ -17,11 +17,20 @@ export const cd = (currentDir, dir) => {
 };
 
 export const ls = (currentDir) => {
-  const files = fs.readdirSync(currentDir).sort();
-  files.forEach((file) => {
-    const type = fs.lstatSync(path.join(currentDir, file)).isDirectory()
-      ? "directory"
-      : "file";
-    console.log(`${type}: ${file}`);
-  });
+  try {
+    const files = fs.readdirSync(currentDir).sort();
+    files.forEach((file) => {
+      try {
+        const fullPath = path.join(currentDir, file);
+        const type = fs.lstatSync(fullPath).isDirectory()
+          ? "directory"
+          : "file";
+        console.log(`${type}: ${file}`);
+      } catch (err) {
+        console.error(`Operation failed for ${file}: ${err.message}`);
+      }
+    });
+  } catch (err) {
+    console.error(`Operation failed: ${err.message}`);
+  }
 };

@@ -6,7 +6,7 @@ import {
   hashFile,
   compress,
   decompress,
-  printAvailableCommands,
+  messages,
 } from "./commands/index.js";
 import readline from "readline";
 import os from "os";
@@ -24,9 +24,8 @@ const printCurrentDirectory = () => {
 };
 
 const startFileManager = (username) => {
-  console.log(`Welcome to the File Manager, ${username}!`);
+  console.log(messages.PROMPTS.WELCOME(username));
   printCurrentDirectory();
-  printAvailableCommands();
 
   rl.on("line", (input) => {
     const [command, ...args] = input.split(" ");
@@ -36,37 +35,54 @@ const startFileManager = (username) => {
           currentDirectory = up(currentDirectory);
           break;
         case "cd":
-          currentDirectory = cd(currentDirectory, args[0]);
+          if (args.length === 0) {
+            console.log(messages.ERRORS.MISSING_DIRECTORY_PATH);
+          } else {
+            currentDirectory = cd(currentDirectory, args[0]);
+          }
           break;
         case "ls":
           ls(currentDirectory);
           break;
         case "os":
-          osInfo(args[0]);
+          if (args.length === 0) {
+            console.log(messages.ERRORS.MISSING_OS_ARGUMENT);
+          } else {
+            osInfo(args[0]);
+          }
           break;
         case "hash":
-          hashFile(currentDirectory, args[0]);
+          if (args.length === 0) {
+            console.log(messages.ERRORS.MISSING_FILE_PATH);
+          } else {
+            hashFile(currentDirectory, args[0]);
+          }
           break;
         case "compress":
-          compress(currentDirectory, args[0], args[1]);
+          if (args.length < 2) {
+            console.log(messages.ERRORS.MISSING_PATH_OR_DEST);
+          } else {
+            compress(currentDirectory, args[0], args[1]);
+          }
           break;
         case "decompress":
-          decompress(currentDirectory, args[0], args[1]);
+          if (args.length < 2) {
+            console.log(messages.ERRORS.MISSING_PATH_OR_DEST);
+          } else {
+            decompress(currentDirectory, args[0], args[1]);
+          }
           break;
         case ".exit":
-          console.log(
-            `Thank you for using File Manager, ${username}, goodbye!`
-          );
+          console.log(messages.PROMPTS.GOODBYE(username));
           rl.close();
           return;
         default:
-          console.log("Invalid input");
+          console.log(messages.ERRORS.INVALID_INPUT);
       }
     } catch (err) {
-      console.log("Operation failed", err);
+      console.log(messages.ERRORS.OPERATION_FAILED, err);
     }
     printCurrentDirectory();
-    printAvailableCommands();
   });
 };
 
@@ -77,6 +93,6 @@ const username = usernameArg ? usernameArg.split("=")[1] : "Guest";
 startFileManager(username);
 
 rl.on("SIGINT", () => {
-  console.log(`Thank you for using File Manager, ${username}, goodbye!`);
+  console.log(messages.PROMPTS.GOODBYE(username));
   rl.close();
 });
