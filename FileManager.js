@@ -1,7 +1,13 @@
-import { up, cd, ls } from "./commands/fileOps.js";
-import { osInfo } from "./commands/osInfo.js";
-import { hashFile } from "./commands/hash.js";
-import { compress, decompress } from "./commands/compress.js";
+import {
+  up,
+  cd,
+  ls,
+  osInfo,
+  hashFile,
+  compress,
+  decompress,
+  printAvailableCommands,
+} from "./commands/index.js";
 import readline from "readline";
 import os from "os";
 
@@ -20,6 +26,7 @@ const printCurrentDirectory = () => {
 const startFileManager = (username) => {
   console.log(`Welcome to the File Manager, ${username}!`);
   printCurrentDirectory();
+  printAvailableCommands();
 
   rl.on("line", (input) => {
     const [command, ...args] = input.split(" ");
@@ -59,6 +66,7 @@ const startFileManager = (username) => {
       console.log("Operation failed", err);
     }
     printCurrentDirectory();
+    printAvailableCommands();
   });
 };
 
