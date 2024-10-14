@@ -24,26 +24,31 @@ export const copyFile = async (currentDir, filePath, newDirectory) => {
     return;
   }
 
-  const readStream = fs.createReadStream(fullPath);
-  const writeStream = fs.createWriteStream(newFilePath);
+  return new Promise((resolve, reject) => {
+    const readStream = fs.createReadStream(fullPath);
+    const writeStream = fs.createWriteStream(newFilePath);
 
-  readStream.on("error", (err) => {
-    console.error(
-      `${red}Operation failed: failed to read file: ${err.message}${reset}`
-    );
+    readStream.on("error", (err) => {
+      console.error(
+        `${red}Operation failed: failed to read file: ${err.message}${reset}`
+      );
+      reject(err);
+    });
+
+    writeStream.on("error", (err) => {
+      console.error(
+        `${red}Operation failed: failed to write file: ${err.message}${reset}`
+      );
+      reject(err);
+    });
+
+    writeStream.on("finish", () => {
+      console.log(
+        `${lightGreen}File copied from ${fullPath} to ${newFilePath}${reset}`
+      );
+      resolve();
+    });
+
+    readStream.pipe(writeStream);
   });
-
-  writeStream.on("error", (err) => {
-    console.error(
-      `${red}Operation failed: failed to write file: ${err.message}${reset}`
-    );
-  });
-
-  writeStream.on("finish", () => {
-    console.log(
-      `${lightGreen}File copied from ${fullPath} to ${newFilePath}${reset}`
-    );
-  });
-
-  readStream.pipe(writeStream);
 };
