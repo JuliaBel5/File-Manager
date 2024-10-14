@@ -1,21 +1,26 @@
-import fs from "fs";
-import path from "path";
-import { cyan, reset } from "./colors.js";
+import fs from "fs/promises";
 
-export const removeFile = (currentDir, filePath) => {
-  const fullPath = path.isAbsolute(filePath)
-    ? filePath
-    : path.join(currentDir, filePath);
+import {
+  lightGreen,
+  red,
+  orange,
+  reset,
+  resolvePath,
+  doesFileExist,
+} from "./index.js";
 
-  if (fs.existsSync(fullPath) && fs.lstatSync(fullPath).isFile()) {
-    fs.unlink(fullPath, (err) => {
-      if (err) {
-        console.error(`Operation failed: ${err.message}`);
-      } else {
-        console.log(`${cyan}File deleted: ${fullPath}${reset}`);
-      }
-    });
+export const removeFile = async (currentDir, filePath) => {
+  const fullPath = resolvePath(currentDir, filePath);
+
+  const fileExists = await doesFileExist(fullPath);
+  if (fileExists) {
+    try {
+      await fs.unlink(fullPath);
+      console.log(`${lightGreen}File deleted: ${fullPath}${reset}`);
+    } catch (err) {
+      console.error(`${red}Operation failed: ${err.message}${reset}`);
+    }
   } else {
-    console.log("File not found");
+    console.log(`${orange}Operation failed: File not found${reset}`);
   }
 };

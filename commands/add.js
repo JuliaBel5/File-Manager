@@ -1,20 +1,20 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs/promises";
+import { resolvePath, doesFileExist, lightGreen, red, reset } from "./index.js";
 
-export const add = (fileName, currentDirectory) => {
-  const fullPath = path.isAbsolute(fileName)
-    ? fileName
-    : path.join(currentDirectory, fileName);
+export const add = async (fileName, currentDirectory) => {
+  const fullPath = resolvePath(currentDirectory, fileName);
 
   try {
-    if (fs.existsSync(fullPath)) {
+    const fileExists = await doesFileExist(fullPath);
+
+    if (fileExists) {
       console.error(`Operation failed: ${fullPath} already exists.`);
       return;
     }
 
-    fs.writeFileSync(fullPath, "");
-    console.log(`\x1b[32mFile ${fileName} created successfully.\x1b[0m`);
+    await fs.writeFile(fullPath, "");
+    console.log(`${lightGreen} ${fileName} created successfully.${reset}`);
   } catch (err) {
-    console.error(`Operation failed: ${err.message}`);
+    console.error(`${red}Operation failed: ${err.message}${reset}`);
   }
 };

@@ -1,27 +1,25 @@
 import fs from "fs";
+import fsPromises from "fs/promises";
 import path from "path";
+import { resolvePath, doesFileExist, lightGreen, red, reset } from "./index.js";
 
-export const copyFile = (currentDir, filePath, newDirectory) => {
-  const fullPath = path.isAbsolute(filePath)
-    ? filePath
-    : path.join(currentDir, filePath);
-
-  const destinationPath = path.isAbsolute(newDirectory)
-    ? newDirectory
-    : path.join(currentDir, newDirectory);
+export const copyFile = async (currentDir, filePath, newDirectory) => {
+  const fullPath = resolvePath(currentDir, filePath);
+  const destinationPath = resolvePath(currentDir, newDirectory);
 
   const fileName = path.basename(fullPath);
-
   const newFilePath = path.join(destinationPath, fileName);
 
-  if (!fs.existsSync(fullPath)) {
-    console.log("Operation failed: file not found");
+  const fileExists = await doesFileExist(fullPath);
+  if (!fileExists) {
+    console.log("Operation failed: source file not found");
     return;
   }
 
-  if (!fs.existsSync(destinationPath)) {
+  const dirExists = await doesFileExist(destinationPath);
+  if (!dirExists || !(await fsPromises.lstat(destinationPath)).isDirectory()) {
     console.log(
-      `Operation failed:  destination directory does not exist: ${destinationPath}`
+      `${red}Operation failed: destination directory does not exist: ${destinationPath}${reset}`
     );
     return;
   }
@@ -30,15 +28,21 @@ export const copyFile = (currentDir, filePath, newDirectory) => {
   const writeStream = fs.createWriteStream(newFilePath);
 
   readStream.on("error", (err) => {
-    console.error(`Operation failed: failed to read file: ${err.message}`);
+    console.error(
+      `${red}Operation failed: failed to read file: ${err.message}${reset}`
+    );
   });
 
   writeStream.on("error", (err) => {
-    console.error(`Operation failed:  failed to write file: ${err.message}`);
+    console.error(
+      `${red}Operation failed: failed to write file: ${err.message}${reset}`
+    );
   });
 
   writeStream.on("finish", () => {
-    console.log(`File copied from ${fullPath} to ${newFilePath}`);
+    console.log(
+      `${lightGreen}File copied from ${fullPath} to ${newFilePath}${reset}`
+    );
   });
 
   readStream.pipe(writeStream);

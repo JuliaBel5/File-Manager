@@ -1,24 +1,7 @@
-import {
-  up,
-  cd,
-  ls,
-  osInfo,
-  hashFile,
-  compress,
-  decompress,
-  messages,
-  cat,
-  add,
-  lightCyan,
-  reset,
-  removeFile,
-  renameFile,
-  moveFile,
-  copyFile,
-} from "./commands/index.js";
-import path from "path";
 import readline from "readline";
 import os from "os";
+import commandHandlers from "./commandHandlers.js";
+import { messages, lightCyan, reset } from "./commands/index.js";
 
 const homeDirectory = os.homedir();
 let currentDirectory = homeDirectory;
@@ -28,123 +11,30 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-const printCurrentDirectory = () => {
+const printCurrentDirectory = (currentDirectory) => {
   console.log(`${lightCyan}You are currently in ${currentDirectory}${reset}`);
 };
 
 const startFileManager = (username) => {
   console.log(messages.PROMPTS.WELCOME(username));
-  printCurrentDirectory();
+  printCurrentDirectory(currentDirectory);
 
-  rl.on("line", (input) => {
+  rl.on("line", async (input) => {
     const [command, ...args] = input.split(" ");
     try {
-      switch (command) {
-        case "add":
-          if (args.length === 0) {
-            console.log(messages.ERRORS.MISSING_FILE_PATH);
-          } else {
-            add(args[0], currentDirectory);
-            printCurrentDirectory();
-          }
-          break;
-        case "up":
-          currentDirectory = up(currentDirectory);
-          printCurrentDirectory();
-          break;
-        case "cd":
-          if (args.length === 0) {
-            console.log(messages.ERRORS.MISSING_DIRECTORY_PATH);
-          } else {
-            currentDirectory = cd(currentDirectory, args[0]);
-            printCurrentDirectory();
-          }
-          break;
-        case "cp":
-          if (args.length < 2) {
-            console.log(messages.ERRORS.MISSING_COPY_ARGUMENTS);
-          } else {
-            copyFile(currentDirectory, args[0], args[1]);
-            printCurrentDirectory();
-          }
-          break;
-
-        case "ls":
-          ls(currentDirectory);
-          printCurrentDirectory();
-          break;
-        case "cat":
-          if (args.length === 0) {
-            console.log(messages.ERRORS.MISSING_FILE_PATH);
-          } else {
-            const filePath = args.join(" ");
-            cat(currentDirectory, filePath);
-          }
-          printCurrentDirectory();
-          break;
-        case "mv":
-          if (args.length < 2) {
-            console.log(messages.ERRORS.MISSING_OS_ARGUMENT);
-          } else {
-            moveFile(currentDirectory, args[0], args[1]);
-            printCurrentDirectory();
-          }
-          break;
-        case "rm":
-          if (args.length === 0) {
-            console.log(messages.ERRORS.MISSING_FILE_PATH);
-          } else {
-            removeFile(currentDirectory, args[0]);
-            printCurrentDirectory();
-          }
-          break;
-        case "rn":
-          if (args.length < 2) {
-            console.log(messages.ERRORS.MISSING_RENAME_ARGUMENTS);
-          } else {
-            renameFile(currentDirectory, args[0], args[1]);
-            printCurrentDirectory();
-          }
-          break;
-        case "os":
-          if (args.length === 0) {
-            console.log(messages.ERRORS.MISSING_OS_ARGUMENT);
-          } else {
-            osInfo(args[0]);
-            printCurrentDirectory();
-          }
-          break;
-        case "hash":
-          if (args.length === 0) {
-            console.log(messages.ERRORS.MISSING_FILE_PATH);
-          } else {
-            hashFile(currentDirectory, args[0]);
-            printCurrentDirectory();
-          }
-          break;
-        case "compress":
-          if (args.length < 2) {
-            console.log(messages.ERRORS.MISSING_PATH_OR_DEST);
-          } else {
-            compress(currentDirectory, args[0], args[1]);
-            printCurrentDirectory();
-          }
-          break;
-        case "decompress":
-          if (args.length < 2) {
-            console.log(messages.ERRORS.MISSING_PATH_OR_DEST);
-          } else {
-            decompress(currentDirectory, args[0], args[1]);
-            printCurrentDirectory();
-          }
-          break;
-        case ".exit":
-          console.log(messages.PROMPTS.GOODBYE(username));
-          rl.close();
-          return;
-        default:
-          console.log(messages.ERRORS.INVALID_INPUT);
-      }
+      
+      const handler = commandHandlers(
+        currentDirectory,
+        username,
+        printCurrentDirectory,
+        (newDir) => {
+          currentDirectory = newDir;  
+        }
+      );
+      const exit = handler[command]
+        ? await handler[command](args)
+        : console.log(messages.ERRORS.INVALID_INPUT);
+      if (exit) return;
     } catch (err) {
       console.log(messages.ERRORS.OPERATION_FAILED, err);
     }

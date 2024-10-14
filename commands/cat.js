@@ -1,21 +1,14 @@
-import fs from "fs";
-import path from "path";
-import { green, red, reset } from "./colors.js";
+import fs from "node:fs";
+import fsPromises from "node:fs/promises";
+import { lightGreen, red, reset, resolvePath } from "./index.js";
 
-export const cat = (currentDir, filePath) => {
+export const cat = async (currentDir, filePath) => {
   try {
-    const fullPath = path.isAbsolute(filePath)
-      ? filePath
-      : path.join(currentDir, filePath);
+    const fullPath = resolvePath(currentDir, filePath);
+    console.log(fullPath);
+    const stats = await fsPromises.lstat(fullPath);
 
-    if (!fs.existsSync(fullPath)) {
-      console.error(
-        `${red}Operation failed: No such file or directory: ${fullPath}${reset}`
-      );
-      return;
-    }
-
-    if (fs.lstatSync(fullPath).isDirectory()) {
+    if (stats.isDirectory()) {
       console.error(
         `${red}Operation failed: ${fullPath} is a directory, not a file.${reset}`
       );
@@ -35,7 +28,7 @@ export const cat = (currentDir, filePath) => {
     });
 
     readStream.on("end", () => {
-      console.log(`${green}\nFile read complete.${reset}`);
+      console.log(`${lightGreen}\nFile read complete.${reset}`);
     });
   } catch (err) {
     console.error(`${red}Operation failed: ${err.message}${reset}`);

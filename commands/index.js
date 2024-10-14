@@ -10,9 +10,11 @@ export { removeFile } from "./remove.js";
 export { renameFile } from "./rename.js";
 export { moveFile } from "./move.js";
 export { copyFile } from "./copy.js";
+export { resolvePath, doesFileExist } from "./utils.js";
 export {
   blue,
   orange,
+  lightBlue,
   green,
   reset,
   yellow,

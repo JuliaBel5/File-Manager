@@ -1,46 +1,42 @@
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
+import { resolvePath, doesFileExist, lightGreen, red, reset } from "./index.js";
 
 export const up = (currentDir) => {
   const parentDir = path.dirname(currentDir);
   return parentDir !== currentDir ? parentDir : currentDir;
 };
 
-export const cd = (currentDir, targetDir) => {
-  let newDir;
-
-  if (path.isAbsolute(targetDir)) {
-    newDir = targetDir;
-  } else {
-    newDir = path.join(currentDir, targetDir);
-  }
+export const cd = async (currentDir, targetDir) => {
+  const newDir = resolvePath(currentDir, targetDir);
 
   try {
-    if (fs.existsSync(newDir) && fs.lstatSync(newDir).isDirectory()) {
+    const dirExists = await doesFileExist(newDir);
+    const stats = await fs.lstat(newDir);
+    if (dirExists && stats.isDirectory()) {
       return newDir;
     } else {
-      console.log("Operation failed: directory does not exist");
+      console.log(`${red}Operation failed: directory does not exist${reset}`);
       return currentDir;
     }
   } catch (error) {
-    console.log("Operation failed:", error.message);
+    console.log(`${red}Operation failed: ${error.message}${reset}`);
     return currentDir;
   }
 };
 
-export const ls = (currentDir) => {
+export const ls = async (currentDir) => {
   try {
-    const files = fs.readdirSync(currentDir);
+    const files = await fs.readdir(currentDir);
 
     const directories = [];
     const regularFiles = [];
 
-    files.forEach((file) => {
+    for (const file of files) {
       try {
         const fullPath = path.join(currentDir, file);
-        const type = fs.lstatSync(fullPath).isDirectory()
-          ? "directory"
-          : "file";
+        const stats = await fs.lstat(fullPath);
+        const type = stats.isDirectory() ? "directory" : "file";
 
         if (type === "directory") {
           directories.push({ Name: file, Type: type });
@@ -48,9 +44,11 @@ export const ls = (currentDir) => {
           regularFiles.push({ Name: file, Type: type });
         }
       } catch (err) {
-        console.error(`Operation failed for ${file}: ${err.message}`);
+        console.error(
+          `${red}Operation failed for ${file}: ${err.message}${reset}`
+        );
       }
-    });
+    }
 
     directories.sort((a, b) => a.Name.localeCompare(b.Name));
     regularFiles.sort((a, b) => a.Name.localeCompare(b.Name));
@@ -59,6 +57,6 @@ export const ls = (currentDir) => {
 
     console.table(tableData);
   } catch (err) {
-    console.error(`Operation failed: ${err.message}`);
+    console.error(`${red}Operation failed: ${err.message}${reset}`);
   }
 };
