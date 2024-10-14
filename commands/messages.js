@@ -1,3 +1,4 @@
+import { blue, orange, green, yellow, reset, lightMagenta } from "./index.js";
 export const messages = {
   ERRORS: {
     INVALID_INPUT: "Invalid input: unknown command",
@@ -8,8 +9,9 @@ export const messages = {
     OPERATION_FAILED: "Operation failed",
   },
   PROMPTS: {
-    WELCOME: (username) => `Welcome to the File Manager, ${username}!`,
+    WELCOME: (username) =>
+      `${lightMagenta}Welcome to the File Manager, ${username}!${reset}`,
     GOODBYE: (username) =>
-      `Thank you for using File Manager, ${username}, goodbye!`,
+      `${orange}Thank you for using File Manager, ${username}, goodbye!${reset}`,
   },
 };

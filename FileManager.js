@@ -8,6 +8,9 @@ import {
   decompress,
   messages,
   cat,
+  add,
+  lightCyan,
+  reset,
 } from "./commands/index.js";
 import path from "path";
 import readline from "readline";
@@ -22,7 +25,7 @@ const rl = readline.createInterface({
 });
 
 const printCurrentDirectory = () => {
-  console.log(`You are currently in ${currentDirectory}`);
+  console.log(`${lightCyan}You are currently in ${currentDirectory}${reset}`);
 };
 
 const startFileManager = (username) => {
@@ -33,6 +36,13 @@ const startFileManager = (username) => {
     const [command, ...args] = input.split(" ");
     try {
       switch (command) {
+        case "add":
+          if (args.length === 0) {
+            console.log(messages.ERRORS.MISSING_FILE_PATH);
+          } else {
+            add(args[0], currentDirectory);
+          }
+          break;
         case "up":
           currentDirectory = up(currentDirectory);
           break;

@@ -28,7 +28,7 @@ export const cat = (filePath) => {
     });
 
     readStream.on("end", () => {
-      console.log("\nFile read complete.");
+      console.log("\x1b[32m\nFile read complete.\x1b[0m");
     });
   } catch (err) {
     console.error(`Operation failed: ${err.message}`);
