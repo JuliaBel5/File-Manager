@@ -1,18 +1,23 @@
 import fs from "fs";
 import path from "path";
+import { green, red, reset } from "./colors.js";
 
-export const cat = (filePath) => {
+export const cat = (currentDir, filePath) => {
   try {
-    const fullPath = path.resolve(filePath);
+    const fullPath = path.isAbsolute(filePath)
+      ? filePath
+      : path.join(currentDir, filePath);
 
     if (!fs.existsSync(fullPath)) {
-      console.error(`Operation failed: No such file or directory: ${fullPath}`);
+      console.error(
+        `${red}Operation failed: No such file or directory: ${fullPath}${reset}`
+      );
       return;
     }
 
     if (fs.lstatSync(fullPath).isDirectory()) {
       console.error(
-        `Operation failed: ${fullPath} is a directory, not a file.`
+        `${red}Operation failed: ${fullPath} is a directory, not a file.${reset}`
       );
       return;
     }
@@ -24,13 +29,15 @@ export const cat = (filePath) => {
     });
 
     readStream.on("error", (err) => {
-      console.error(`Operation failed. Error reading file: ${err.message}`);
+      console.error(
+        `${red}Operation failed. Error reading file: ${err.message}${reset}`
+      );
     });
 
     readStream.on("end", () => {
-      console.log("\x1b[32m\nFile read complete.\x1b[0m");
+      console.log(`${green}\nFile read complete.${reset}`);
     });
   } catch (err) {
-    console.error(`Operation failed: ${err.message}`);
+    console.error(`${red}Operation failed: ${err.message}${reset}`);
   }
 };

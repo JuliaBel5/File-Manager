@@ -13,6 +13,8 @@ import {
   reset,
   removeFile,
   renameFile,
+  moveFile,
+  copyFile,
 } from "./commands/index.js";
 import path from "path";
 import readline from "readline";
@@ -42,12 +44,13 @@ const startFileManager = (username) => {
           if (args.length === 0) {
             console.log(messages.ERRORS.MISSING_FILE_PATH);
           } else {
-            add(args[0], currentDirectory, printCurrentDirectory); // Pass callback
+            add(args[0], currentDirectory);
+            printCurrentDirectory();
           }
           break;
         case "up":
           currentDirectory = up(currentDirectory);
-          printCurrentDirectory(); // Immediately after directory change
+          printCurrentDirectory();
           break;
         case "cd":
           if (args.length === 0) {
@@ -57,6 +60,15 @@ const startFileManager = (username) => {
             printCurrentDirectory();
           }
           break;
+        case "cp":
+          if (args.length < 2) {
+            console.log(messages.ERRORS.MISSING_COPY_ARGUMENTS);
+          } else {
+            copyFile(currentDirectory, args[0], args[1]);
+            printCurrentDirectory();
+          }
+          break;
+
         case "ls":
           ls(currentDirectory);
           printCurrentDirectory();
@@ -65,10 +77,16 @@ const startFileManager = (username) => {
           if (args.length === 0) {
             console.log(messages.ERRORS.MISSING_FILE_PATH);
           } else {
-            const filePath = path.isAbsolute(args[0])
-              ? args[0]
-              : path.join(currentDirectory, args.join(" "));
-            cat(filePath);
+            const filePath = args.join(" ");
+            cat(currentDirectory, filePath);
+          }
+          printCurrentDirectory();
+          break;
+        case "mv":
+          if (args.length < 2) {
+            console.log(messages.ERRORS.MISSING_OS_ARGUMENT);
+          } else {
+            moveFile(currentDirectory, args[0], args[1]);
             printCurrentDirectory();
           }
           break;
@@ -93,7 +111,7 @@ const startFileManager = (username) => {
             console.log(messages.ERRORS.MISSING_OS_ARGUMENT);
           } else {
             osInfo(args[0]);
-            printCurrentDirectory(); // os info
+            printCurrentDirectory();
           }
           break;
         case "hash":

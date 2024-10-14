@@ -8,7 +8,8 @@ export { cat } from "./cat.js";
 export { add } from "./add.js";
 export { removeFile } from "./remove.js";
 export { renameFile } from "./rename.js";
-
+export { moveFile } from "./move.js";
+export { copyFile } from "./copy.js";
 export {
   blue,
   orange,
