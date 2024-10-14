@@ -22,18 +22,19 @@ const startFileManager = (username) => {
   rl.on("line", async (input) => {
     const [command, ...args] = input.split(" ");
     try {
-      
       const handler = commandHandlers(
         currentDirectory,
         username,
         printCurrentDirectory,
         (newDir) => {
-          currentDirectory = newDir;  
+          currentDirectory = newDir;
         }
       );
       const exit = handler[command]
         ? await handler[command](args)
-        : console.log(messages.ERRORS.INVALID_INPUT);
+        : console.log(
+            `${messages.ERRORS.INVALID_INPUT}, print help to see the list of available commands`
+          );
       if (exit) return;
     } catch (err) {
       console.log(messages.ERRORS.OPERATION_FAILED, err);

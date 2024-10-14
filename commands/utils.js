@@ -1,6 +1,7 @@
 import path from "path";
 import { access } from "node:fs/promises";
 import { constants } from "node:fs";
+import { red, reset } from "./index.js";
 
 export const resolvePath = (currentDir, filePath) => {
   try {
@@ -8,7 +9,9 @@ export const resolvePath = (currentDir, filePath) => {
       ? filePath
       : path.resolve(currentDir, filePath);
   } catch (error) {
-    console.error(`Error resolving path: ${error.message}`);
+    console.error(
+      `${red}Operation filed: Error resolving path: ${error.message}${reset}`
+    );
     return currentDir;
   }
 };

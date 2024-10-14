@@ -13,6 +13,7 @@ import {
   renameFile,
   moveFile,
   copyFile,
+  printAvailableCommands,
 } from "./commands/index.js";
 
 const trimArgs = (args) => {
@@ -54,9 +55,10 @@ const commandHandlers = (
       } else {
         const newDir = await cd(currentDirectory, trimmedArgs[0]);
         setCurrentDirectory(newDir);
+        printCurrentDirectory(newDir);
       }
-    } finally {
-      printCurrentDirectory(currentDirectory);
+    } catch (error) {
+      console.error(`Operation failed: ${error.message}`);
     }
   },
   cp: async (args) => {
@@ -174,6 +176,9 @@ const commandHandlers = (
     } finally {
       printCurrentDirectory(currentDirectory);
     }
+  },
+  help: () => {
+    printAvailableCommands();
   },
   ".exit": () => {
     console.log(messages.PROMPTS.GOODBYE(username));
