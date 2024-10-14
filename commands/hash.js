@@ -9,14 +9,14 @@ export const hashFile = async (currentDir, filePath) => {
 
   const fileExists = await doesFileExist(fullPath);
   if (!fileExists) {
-    console.log(`${red}File not found${reset}`);
+    console.log(`${red}Operation failed: File not found${reset}`);
     return;
   }
 
   try {
     const stats = await fs.lstat(fullPath);
     if (!stats.isFile()) {
-      console.log(`${red}Not a file: ${fullPath}${reset}`);
+      console.log(`${red}Operation failed: not a file: ${fullPath}${reset}`);
       return;
     }
 
@@ -30,7 +30,9 @@ export const hashFile = async (currentDir, filePath) => {
     });
 
     input.on("error", (err) => {
-      console.error(`${red}Error reading file: ${err.message}${reset}`);
+      console.error(
+        `${red}Operation failed: error reading file: ${err.message}${reset}`
+      );
     });
   } catch (err) {
     console.error(`${red}Operation failed: ${err.message}${reset}`);

@@ -28,7 +28,8 @@ const startFileManager = (username) => {
         printCurrentDirectory,
         (newDir) => {
           currentDirectory = newDir;
-        }
+        },
+        rl
       );
       const exit = handler[command]
         ? await handler[command](args)

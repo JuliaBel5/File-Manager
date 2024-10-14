@@ -28,7 +28,8 @@ const commandHandlers = (
   currentDirectory,
   username,
   printCurrentDirectory,
-  setCurrentDirectory
+  setCurrentDirectory,
+  rl
 ) => ({
   add: async (args) => {
     try {
