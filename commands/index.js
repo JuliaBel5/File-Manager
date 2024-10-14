@@ -6,6 +6,9 @@ export { printAvailableCommands } from "./help.js";
 export { messages } from "./messages.js";
 export { cat } from "./cat.js";
 export { add } from "./add.js";
+export { removeFile } from "./remove.js";
+export { renameFile } from "./rename.js";
+
 export {
   blue,
   orange,

@@ -2,7 +2,9 @@ import fs from "fs";
 import path from "path";
 
 export const add = (fileName, currentDirectory) => {
-  const fullPath = path.join(currentDirectory, fileName);
+  const fullPath = path.isAbsolute(fileName)
+    ? fileName
+    : path.join(currentDirectory, fileName);
 
   try {
     if (fs.existsSync(fullPath)) {

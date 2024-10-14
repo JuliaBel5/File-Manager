@@ -16,7 +16,6 @@ export const hashFile = (currentDir, filePath) => {
     input.on("end", () => {
       const hashValue = hash.digest("hex");
       console.log(`${magenta}Hash: ${hashValue}${reset}`);
-      console.log(`You are currently in ${currentDir}`);
     });
   } else {
     console.log("File not found");

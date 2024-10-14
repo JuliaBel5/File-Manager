@@ -11,6 +11,8 @@ import {
   add,
   lightCyan,
   reset,
+  removeFile,
+  renameFile,
 } from "./commands/index.js";
 import path from "path";
 import readline from "readline";
@@ -40,21 +42,24 @@ const startFileManager = (username) => {
           if (args.length === 0) {
             console.log(messages.ERRORS.MISSING_FILE_PATH);
           } else {
-            add(args[0], currentDirectory);
+            add(args[0], currentDirectory, printCurrentDirectory); // Pass callback
           }
           break;
         case "up":
           currentDirectory = up(currentDirectory);
+          printCurrentDirectory(); // Immediately after directory change
           break;
         case "cd":
           if (args.length === 0) {
             console.log(messages.ERRORS.MISSING_DIRECTORY_PATH);
           } else {
             currentDirectory = cd(currentDirectory, args[0]);
+            printCurrentDirectory();
           }
           break;
         case "ls":
           ls(currentDirectory);
+          printCurrentDirectory();
           break;
         case "cat":
           if (args.length === 0) {
@@ -64,14 +69,31 @@ const startFileManager = (username) => {
               ? args[0]
               : path.join(currentDirectory, args.join(" "));
             cat(filePath);
+            printCurrentDirectory();
           }
           break;
-
+        case "rm":
+          if (args.length === 0) {
+            console.log(messages.ERRORS.MISSING_FILE_PATH);
+          } else {
+            removeFile(currentDirectory, args[0]);
+            printCurrentDirectory();
+          }
+          break;
+        case "rn":
+          if (args.length < 2) {
+            console.log(messages.ERRORS.MISSING_RENAME_ARGUMENTS);
+          } else {
+            renameFile(currentDirectory, args[0], args[1]);
+            printCurrentDirectory();
+          }
+          break;
         case "os":
           if (args.length === 0) {
             console.log(messages.ERRORS.MISSING_OS_ARGUMENT);
           } else {
             osInfo(args[0]);
+            printCurrentDirectory(); // os info
           }
           break;
         case "hash":
@@ -79,6 +101,7 @@ const startFileManager = (username) => {
             console.log(messages.ERRORS.MISSING_FILE_PATH);
           } else {
             hashFile(currentDirectory, args[0]);
+            printCurrentDirectory();
           }
           break;
         case "compress":
@@ -86,6 +109,7 @@ const startFileManager = (username) => {
             console.log(messages.ERRORS.MISSING_PATH_OR_DEST);
           } else {
             compress(currentDirectory, args[0], args[1]);
+            printCurrentDirectory();
           }
           break;
         case "decompress":
@@ -93,6 +117,7 @@ const startFileManager = (username) => {
             console.log(messages.ERRORS.MISSING_PATH_OR_DEST);
           } else {
             decompress(currentDirectory, args[0], args[1]);
+            printCurrentDirectory();
           }
           break;
         case ".exit":
@@ -105,7 +130,6 @@ const startFileManager = (username) => {
     } catch (err) {
       console.log(messages.ERRORS.OPERATION_FAILED, err);
     }
-    printCurrentDirectory();
   });
 };
 
